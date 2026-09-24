@@ -1,21 +1,93 @@
+"use client";
+
+import {
+  Bar,
+  CartesianGrid,
+  ComposedChart,
+  Legend,
+  Line,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import type { TooltipContentProps } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatRupiah } from "@/lib/formatters";
-import type { KdkmpFinancialMatrix } from "@/types/kdkmp-dashboard";
+import type { KdkmpFinancialMatrix, KdkmpFinancialMatrixPoint } from "@/types/kdkmp-dashboard";
+
+type ChartPoint = KdkmpFinancialMatrixPoint & {
+  label: string;
+  plan_revenue: number | null;
+  actual_revenue: number | null;
+};
 
 function money(value: number | null) {
   return value == null ? "-" : formatRupiah(value);
 }
 
+function compactMoney(value: number | string) {
+  const amount = Number(value);
+  if (!Number.isFinite(amount)) return "-";
+
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(amount).replace(/\s/g, "");
+}
+
+function duration(minutes: number) {
+  const hours = Math.floor(minutes / 60);
+  const remainder = minutes % 60;
+  if (!hours) return `${remainder} menit`;
+  return remainder ? `${hours} jam ${remainder} menit` : `${hours} jam`;
+}
+
+function MatrixTooltip({ active, payload }: Partial<TooltipContentProps>) {
+  const point = payload?.[0]?.payload as ChartPoint | undefined;
+  if (!active || !point) return null;
+
+  const rows = [
+    ["Estimasi", duration(point.estimated_minutes)],
+    ["Durasi selesai", duration(point.actual_duration_minutes)],
+    ["Plan cost", money(point.plan_cost)],
+    ["Actual cost", money(point.actual_cost)],
+    ["Plan kumulatif", money(point.cumulative_plan_cost)],
+    ["Actual kumulatif", money(point.cumulative_actual_cost)],
+  ];
+
+  return (
+    <div className="w-64 rounded-lg border bg-card p-3 text-sm shadow-lg">
+      <p className="font-semibold text-foreground">Proses {point.process}: {point.task_name}</p>
+      <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-muted-foreground">
+        {rows.map(([label, value]) => (
+          <div key={label} className="contents">
+            <dt>{label}</dt>
+            <dd className="text-right font-medium tabular-nums text-foreground">{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
 export function FinancialMatrix({ matrix }: { matrix: KdkmpFinancialMatrix }) {
-  const maximum = Math.max(...matrix.points.flatMap((point) => [point.cumulative_plan_cost, point.cumulative_actual_cost]), 1);
+  const chartData: ChartPoint[] = matrix.points.map((point) => ({
+    ...point,
+    label: `${point.process}. ${point.task_name}`,
+    plan_revenue: matrix.plan_revenue,
+    actual_revenue: matrix.actual_revenue,
+  }));
 
   return (
     <Card>
       <CardHeader className="gap-3">
         <div>
           <CardTitle>Financial Matrix</CardTitle>
-          <CardDescription>Perbandingan akumulasi biaya rencana dan realisasi berdasarkan task hari ini.</CardDescription>
+          <CardDescription>Perbandingan biaya dan revenue rencana serta realisasi berdasarkan task hari ini.</CardDescription>
         </div>
         <div className="grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-4">
           <Metric label="Fixed cost" value={money(matrix.fixed_cost)} />
@@ -25,24 +97,31 @@ export function FinancialMatrix({ matrix }: { matrix: KdkmpFinancialMatrix }) {
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
-        {matrix.points.length ? (
-          <div className="space-y-3" aria-label="Grafik cumulative cost financial matrix">
-            <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
-              <Legend className="bg-primary" label="Plan cost" />
-              <Legend className="bg-muted-foreground" label="Actual cost" />
-            </div>
-            <div className="space-y-3">
-              {matrix.points.map((point) => (
-                <div key={point.task_id} className="grid gap-1 sm:grid-cols-[minmax(10rem,1fr)_minmax(14rem,2fr)] sm:items-center sm:gap-4">
-                  <p className="truncate text-sm" title={point.task_name}>
-                    {point.process}. {point.task_name}
-                  </p>
-                  <div className="space-y-1.5">
-                    <Bar label="Plan" value={point.cumulative_plan_cost} maximum={maximum} className="bg-primary" />
-                    <Bar label="Actual" value={point.cumulative_actual_cost} maximum={maximum} className="bg-muted-foreground" />
-                  </div>
-                </div>
-              ))}
+        {chartData.length ? (
+          <div className="overflow-x-auto pb-2" aria-label="Grafik financial matrix">
+            <div className="h-[460px] min-w-[960px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={chartData} margin={{ top: 24, right: 28, left: 12, bottom: 88 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis
+                    dataKey="label"
+                    angle={-42}
+                    height={108}
+                    interval={0}
+                    textAnchor="end"
+                    tick={{ fill: "var(--muted-foreground)", fontSize: 10 }}
+                  />
+                  <YAxis tickFormatter={compactMoney} tick={{ fill: "var(--muted-foreground)", fontSize: 11 }} />
+                  <Tooltip content={<MatrixTooltip />} />
+                  <Legend verticalAlign="top" height={48} />
+                  <Bar dataKey="plan_cost" name="Plan Cost" fill="var(--chart-4)" maxBarSize={28} radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="actual_cost" name="Actual Cost" fill="var(--chart-1)" maxBarSize={28} radius={[4, 4, 0, 0]} />
+                  <Line type="linear" dataKey="cumulative_plan_cost" name="Plan Cost Kumulatif" stroke="var(--chart-5)" strokeWidth={3} strokeDasharray="2 7" dot={{ r: 3 }} />
+                  <Line type="linear" dataKey="cumulative_actual_cost" name="Actual Cost Kumulatif" stroke="var(--chart-2)" strokeWidth={3} strokeDasharray="2 7" dot={{ r: 3 }} />
+                  <Line type="linear" dataKey="plan_revenue" name="Plan Revenue" stroke="var(--foreground)" strokeWidth={3} dot={false} connectNulls={false} />
+                  <Line type="linear" dataKey="actual_revenue" name="Actual Revenue" stroke="var(--primary)" strokeWidth={3} dot={false} connectNulls={false} />
+                </ComposedChart>
+              </ResponsiveContainer>
             </div>
           </div>
         ) : (
@@ -67,6 +146,7 @@ export function FinancialMatrix({ matrix }: { matrix: KdkmpFinancialMatrix }) {
                 <TableCell className="text-right tabular-nums">{money(point.actual_cost)}</TableCell>
               </TableRow>
             ))}
+            {!matrix.points.length ? <TableRow><TableCell colSpan={4} className="py-8 text-center text-muted-foreground">Belum ada data matrix.</TableCell></TableRow> : null}
           </TableBody>
         </Table>
       </CardContent>
@@ -76,20 +156,4 @@ export function FinancialMatrix({ matrix }: { matrix: KdkmpFinancialMatrix }) {
 
 function Metric({ label, value }: { label: string; value: string }) {
   return <div className="rounded-lg bg-muted px-3 py-2"><p className="text-xs text-muted-foreground">{label}</p><p className="font-medium tabular-nums">{value}</p></div>;
-}
-
-function Legend({ className, label }: { className: string; label: string }) {
-  return <span className="flex items-center gap-1.5"><span className={`size-2 rounded-full ${className}`} />{label}</span>;
-}
-
-function Bar({ label, value, maximum, className }: { label: string; value: number; maximum: number; className: string }) {
-  return (
-    <div className="flex items-center gap-2">
-      <span className="w-10 text-xs text-muted-foreground">{label}</span>
-      <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
-        <div className={`h-full rounded-full ${className}`} style={{ width: `${Math.max(0, Math.min(100, value / maximum * 100))}%` }} />
-      </div>
-      <span className="w-24 text-right text-xs tabular-nums text-muted-foreground">{formatRupiah(value)}</span>
-    </div>
-  );
 }
