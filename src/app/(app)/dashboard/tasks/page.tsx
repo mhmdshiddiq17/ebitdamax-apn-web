@@ -57,7 +57,7 @@ export default async function TaskDashboardPage() {
       <TaskSummaryCards summary={dashboard.summary} businessDate={dashboard.business_date} />
 
       {dashboard.operational_attendance ? (
-        <TaskAttendanceCard attendance={dashboard.operational_attendance} />
+        <TaskAttendanceCard attendance={dashboard.operational_attendance} inputHref={isKdkmpManager ? "/dashboard/kdkmp/input" : undefined} />
       ) : null}
 
       <TaskList

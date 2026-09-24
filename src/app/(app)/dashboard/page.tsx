@@ -2,11 +2,15 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { serverApiFetch } from "@/lib/server-api";
 import type { AuthUser } from "@/types/auth";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const user = await serverApiFetch<AuthUser>("/auth/me");
+  if (user.role?.domain === "kdkmp" && user.role.slug === "manager") {
+    redirect("/dashboard/kdkmp");
+  }
 
   return (
     <>
@@ -39,10 +43,6 @@ export default async function DashboardPage() {
           </div>
         </CardContent>
       </Card>
-
-      <p className="text-sm text-muted-foreground">
-        Dashboard KDKMP dan fitur manager akan dibangun pada sprint berikutnya.
-      </p>
     </>
   );
 }

@@ -1,10 +1,12 @@
 import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { OPERATIONAL_ATTENDANCE_ROLES } from "@/lib/task-constants";
 import type { DashboardAttendance } from "@/types/task-dashboard";
+import Link from "next/link";
 
-export function TaskAttendanceCard({ attendance }: { attendance: DashboardAttendance }) {
+export function TaskAttendanceCard({ attendance, inputHref }: { attendance: DashboardAttendance; inputHref?: string }) {
   return (
     <Card className="max-w-2xl">
       <CardHeader>
@@ -17,6 +19,7 @@ export function TaskAttendanceCard({ attendance }: { attendance: DashboardAttend
         <CardDescription>
           Jumlah anggota hadir hari ini, yang sudah teralokasi ke task berjalan, dan sisa yang tersedia.
         </CardDescription>
+        {inputHref ? <Link href={inputHref} className={buttonVariants({ variant: "outline", size: "sm" })}>Kelola kehadiran</Link> : null}
       </CardHeader>
       <CardContent>
         <Table>

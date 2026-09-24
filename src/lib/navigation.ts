@@ -33,15 +33,15 @@ export type NavGroup = {
 };
 
 export function navigationForRole(role: AuthUser["role"]): NavGroup[] {
-  const isManager = role?.slug === "manager";
-  const isRegionalManager = role?.slug === "manager-wilayah";
+  const isManager = role?.domain === "kdkmp" && role.slug === "manager";
+  const isRegionalManager = role?.domain === "kdkmp" && role.slug === "manager-wilayah";
   const isSuperadmin = role?.level === "superadmin";
 
   const groups: NavGroup[] = [
     {
       label: "Operasional",
       items: [
-        { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard, status: "ready" },
+        { title: "Dashboard", href: isManager ? "/dashboard/kdkmp" : "/dashboard", icon: LayoutDashboard, status: "ready" },
         ...(isManager || isRegionalManager
           ? ([
               { title: "Tugas Harian", href: "/dashboard/tasks", icon: ClipboardList, status: "ready" },
