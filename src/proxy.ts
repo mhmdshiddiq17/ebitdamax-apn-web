@@ -11,6 +11,7 @@ const PROTECTED_PREFIXES = [
   "/meeting-minutes",
   "/roles",
   "/users",
+  "/task-categories",
 ];
 
 const AUTH_PAGES = ["/login", "/register", "/forgot-password", "/two-factor-challenge"];
@@ -55,6 +56,7 @@ export const config = {
     "/meeting-minutes/:path*",
     "/roles/:path*",
     "/users/:path*",
+    "/task-categories/:path*",
     "/login",
     "/register",
     "/forgot-password",

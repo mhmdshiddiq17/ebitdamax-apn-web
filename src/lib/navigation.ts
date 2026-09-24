@@ -44,7 +44,7 @@ export function navigationForRole(role: AuthUser["role"]): NavGroup[] {
         { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard, status: "ready" },
         ...(isManager || isRegionalManager
           ? ([
-              { title: "Tugas Harian", href: "/dashboard/tasks", icon: ClipboardList, status: "soon" },
+              { title: "Tugas Harian", href: "/dashboard/tasks", icon: ClipboardList, status: "ready" },
               { title: "Meeting Minutes", href: "/meeting-minutes", icon: CalendarDays, status: "soon" },
             ] satisfies NavItem[])
           : []),
@@ -70,8 +70,8 @@ export function navigationForRole(role: AuthUser["role"]): NavGroup[] {
         items: [
           { title: "Pengguna", href: "/users", icon: Users, status: "ready" },
           { title: "Role", href: "/roles", icon: ShieldCheck, status: "ready" },
-          { title: "Kategori Tugas", href: "/task-categories", icon: Tags, status: "soon" },
-          { title: "Tugas", href: "/tasks", icon: ClipboardList, status: "soon" },
+          { title: "Kategori Tugas", href: "/task-categories", icon: Tags, status: "ready" },
+          { title: "Tugas", href: "/tasks", icon: ClipboardList, status: "ready" },
         ],
       },
       {
