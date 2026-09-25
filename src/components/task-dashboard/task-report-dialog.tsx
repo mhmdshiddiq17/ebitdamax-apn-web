@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import Image from "next/image";
 import { toast } from "sonner";
 import {
   DynamicFieldInput,
   type AdditionalFieldValue,
 } from "@/components/task-dashboard/dynamic-field-input";
+import { TaskPhotoCamera } from "@/components/task-dashboard/task-photo-camera";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -38,6 +40,10 @@ function emptyAllocations(): Record<string, string> {
   return Object.fromEntries(OPERATIONAL_ATTENDANCE_ROLES.map((role) => [role.key, "0"]));
 }
 
+function formatFileSize(size: number) {
+  return size < 1024 * 1024 ? `${Math.ceil(size / 1024)} KB` : `${(size / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 export function TaskReportDialog({
   open,
   onOpenChange,
@@ -48,6 +54,8 @@ export function TaskReportDialog({
   onDone,
 }: Props) {
   const [photo, setPhoto] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const photoPreviewRef = useRef<string | null>(null);
   const [documents, setDocuments] = useState<File[]>([]);
   const [values, setValues] = useState<Record<string, AdditionalFieldValue>>({});
   const [valueFiles, setValueFiles] = useState<Record<string, File | null>>({});
@@ -62,6 +70,18 @@ export function TaskReportDialog({
     (sum, role) => sum + (Number(allocations[role.key]) || 0),
     0,
   );
+
+  useEffect(() => () => {
+    if (photoPreviewRef.current) URL.revokeObjectURL(photoPreviewRef.current);
+  }, []);
+
+  function selectPhoto(nextPhoto: File | null) {
+    if (photoPreviewRef.current) URL.revokeObjectURL(photoPreviewRef.current);
+    const nextPreview = nextPhoto ? URL.createObjectURL(nextPhoto) : null;
+    photoPreviewRef.current = nextPreview;
+    setPhotoPreview(nextPreview);
+    setPhoto(nextPhoto);
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -143,10 +163,20 @@ export function TaskReportDialog({
                 id="report_photo"
                 type="file"
                 accept="image/jpeg,image/png,image/webp,image/gif"
-                onChange={(event) => setPhoto(event.target.files?.[0] ?? null)}
-                required
+                onChange={(event) => selectPhoto(event.target.files?.[0] ?? null)}
+                capture="environment"
               />
-              <p className="text-xs text-muted-foreground">JPG/PNG/WEBP/GIF, maksimal 3 MB.</p>
+              {open ? <TaskPhotoCamera disabled={submitting} fileNamePrefix={mode === "start" ? "foto-mulai" : "foto-selesai"} onCapture={selectPhoto} /> : null}
+              <p className="text-xs text-muted-foreground">JPG/PNG/WEBP/GIF, maksimal 3 MB. Foto dari kamera dikompresi maksimal 300 KB.</p>
+              {photo && photoPreview ? (
+                <div className="flex items-center gap-3 rounded-lg border bg-muted/30 p-2">
+                  <Image src={photoPreview} alt={`Pratinjau ${photoLabel}`} width={64} height={64} unoptimized className="size-16 rounded-md border object-cover" />
+                  <div className="min-w-0 text-xs">
+                    <p className="truncate font-medium" title={photo.name}>{photo.name}</p>
+                    <p className="text-muted-foreground">{formatFileSize(photo.size)}</p>
+                  </div>
+                </div>
+              ) : null}
             </div>
 
             <div className="space-y-2">

@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   Bell,
   CalendarDays,
+  CheckCircle2,
   ClipboardList,
   Database,
   LayoutDashboard,
@@ -44,12 +45,14 @@ export function navigationForRole(role: AuthUser["role"]): NavGroup[] {
         ...(isManager
           ? ([
               { title: "Tugas Harian", href: "/dashboard/tasks", icon: ClipboardList, status: "ready" },
+              { title: "Tugas Selesai", href: "/dashboard/tasks/completed", icon: CheckCircle2, status: "ready" },
             ] satisfies NavItem[])
           : []),
         ...(isManager
           ? ([
               { title: "Meeting Minutes", href: "/meeting-minutes", icon: CalendarDays, status: "ready" },
               { title: "Action Items", href: "/meeting-minutes/action-items", icon: ListChecks, status: "ready" },
+              { title: "Customer Analysis", href: "/customer-analyses", icon: Users, status: "ready" },
             ] satisfies NavItem[])
           : []),
       ],
@@ -81,7 +84,7 @@ export function navigationForRole(role: AuthUser["role"]): NavGroup[] {
       {
         label: "Komunikasi",
         items: [
-          { title: "Pengumuman", href: "/announcements", icon: Megaphone, status: "soon" },
+          { title: "Pengumuman", href: "/announcements", icon: Megaphone, status: "ready" },
         ],
       },
     );
@@ -90,7 +93,9 @@ export function navigationForRole(role: AuthUser["role"]): NavGroup[] {
   groups.push({
     label: "Umum",
     items: [
-      { title: "Notifikasi", href: "/notifications", icon: Bell, status: "soon" },
+      ...(isManager
+        ? ([{ title: "Notifikasi", href: "/notifications", icon: Bell, status: "ready" }] satisfies NavItem[])
+        : []),
       { title: "Pengaturan", href: "/settings/profile", icon: Settings, status: "ready" },
     ],
   });
