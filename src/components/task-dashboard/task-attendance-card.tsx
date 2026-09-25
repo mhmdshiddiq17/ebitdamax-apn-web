@@ -22,7 +22,7 @@ export function TaskAttendanceCard({ attendance, inputHref }: { attendance: Dash
         {inputHref ? <Link href={inputHref} className={buttonVariants({ variant: "outline", size: "sm" })}>Kelola kehadiran</Link> : null}
       </CardHeader>
       <CardContent>
-        <Table>
+        <Table className="min-w-[520px]">
           <TableHeader>
             <TableRow>
               <TableHead>Role</TableHead>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { CheckSquare2, Coins, ListChecks, Save, UsersRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -50,48 +51,48 @@ export function KdkmpDailyInput({ data }: { data: KdkmpDashboardInputResponse })
   }
 
   return (
-    <div className="grid gap-6 xl:grid-cols-2">
+    <div className="grid gap-6 xl:grid-cols-2" data-tour="daily-input">
       <Card>
         <CardHeader>
-          <CardTitle>Target & biaya hari ini</CardTitle>
+          <CardTitle className="flex items-center gap-2"><Coins className="size-5 text-primary" aria-hidden="true" />Target & biaya hari ini</CardTitle>
           <CardDescription>Masukkan angka tanpa pemisah ribuan; nilai aktual dihitung dari task yang selesai.</CardDescription>
         </CardHeader>
         <CardContent>
           <form className="space-y-4" onSubmit={(event: FormEvent) => { event.preventDefault(); void submit("daily", "/kdkmp-dashboard/today", { plan_revenue: planRevenue, variable_cost: variableCost || null }); }}>
             <div className="space-y-2">
-              <Label htmlFor="plan-revenue">Plan revenue</Label>
+              <Label htmlFor="plan-revenue" className="flex items-center gap-2"><Coins className="size-4" aria-hidden="true" />Plan revenue</Label>
               <Input id="plan-revenue" type="number" min="0" step="0.01" required value={planRevenue} onChange={(event) => setPlanRevenue(event.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="variable-cost">Variable cost rencana</Label>
+              <Label htmlFor="variable-cost" className="flex items-center gap-2"><Coins className="size-4" aria-hidden="true" />Variable cost rencana</Label>
               <Input id="variable-cost" type="number" min="0" step="0.01" value={variableCost} onChange={(event) => setVariableCost(event.target.value)} />
             </div>
-            <Button type="submit" disabled={submitting !== null}>{submitting === "daily" ? "Menyimpan…" : "Simpan target"}</Button>
+            <Button type="submit" disabled={submitting !== null}><Save className="size-4" aria-hidden="true" />{submitting === "daily" ? "Menyimpan…" : "Simpan target"}</Button>
           </form>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Kehadiran operasional</CardTitle>
+          <CardTitle className="flex items-center gap-2"><UsersRound className="size-5 text-primary" aria-hidden="true" />Kehadiran operasional</CardTitle>
           <CardDescription>Task tidak dapat dimulai sebelum jumlah kehadiran disimpan.</CardDescription>
         </CardHeader>
         <CardContent>
           <form className="grid gap-3 sm:grid-cols-2" onSubmit={(event: FormEvent) => { event.preventDefault(); void submit("attendance", "/kdkmp-dashboard/today/operational-attendance", { operational_attendance: Object.fromEntries(Object.entries(attendance).map(([key, value]) => [key, Number(value)])) }); }}>
             {OPERATIONAL_ATTENDANCE_ROLES.map((role) => (
               <div key={role.key} className="space-y-2">
-                <Label htmlFor={`attendance-${role.key}`}>{role.label}</Label>
+                <Label htmlFor={`attendance-${role.key}`} className="flex items-center gap-2"><UsersRound className="size-4" aria-hidden="true" />{role.label}</Label>
                 <Input id={`attendance-${role.key}`} type="number" min="0" step="1" required value={attendance[role.key]} onChange={(event) => setAttendance((current) => ({ ...current, [role.key]: event.target.value }))} />
               </div>
             ))}
-            <div className="sm:col-span-2"><Button type="submit" disabled={submitting !== null}>{submitting === "attendance" ? "Menyimpan…" : "Simpan kehadiran"}</Button></div>
+            <div className="sm:col-span-2"><Button type="submit" disabled={submitting !== null}><Save className="size-4" aria-hidden="true" />{submitting === "attendance" ? "Menyimpan…" : "Simpan kehadiran"}</Button></div>
           </form>
         </CardContent>
       </Card>
 
       <Card className="xl:col-span-2">
         <CardHeader>
-          <CardTitle>Pilihan task opsional</CardTitle>
+          <CardTitle className="flex items-center gap-2"><ListChecks className="size-5 text-primary" aria-hidden="true" />Pilihan task opsional</CardTitle>
           <CardDescription>Memilih satu task akan mengaktifkan seluruh task opsional pada poin BMC yang sama. Task yang sedang berjalan tidak dapat dilepas.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -106,7 +107,7 @@ export function KdkmpDailyInput({ data }: { data: KdkmpDashboardInputResponse })
                 <div key={group.label} className="rounded-lg border p-4">
                   <label className="flex items-center gap-3 font-medium">
                     {optionalTasks.length ? <Checkbox checked={checked} disabled={locked} onCheckedChange={(value) => toggleGroup(taskIDs, value === true)} /> : null}
-                    <span>{label}</span>
+                    <span className="flex items-center gap-2"><CheckSquare2 className="size-4" aria-hidden="true" />{label}</span>
                     {locked ? <Badge>Berjalan</Badge> : null}
                   </label>
                   <ul className="mt-3 space-y-2 pl-7 text-sm text-muted-foreground">
@@ -115,7 +116,7 @@ export function KdkmpDailyInput({ data }: { data: KdkmpDashboardInputResponse })
                 </div>
               );
             })}
-            <Button type="submit" disabled={submitting !== null}>{submitting === "selection" ? "Menyimpan…" : "Simpan pilihan task"}</Button>
+            <Button type="submit" disabled={submitting !== null}><Save className="size-4" aria-hidden="true" />{submitting === "selection" ? "Menyimpan…" : "Simpan pilihan task"}</Button>
           </form>
         </CardContent>
       </Card>

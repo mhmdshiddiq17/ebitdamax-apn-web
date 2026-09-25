@@ -42,7 +42,7 @@ export function AppSidebar({ user }: { user: AuthUser }) {
   }
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="offcanvas">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>

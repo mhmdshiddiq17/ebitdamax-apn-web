@@ -15,5 +15,11 @@ export type AuthUser = {
   sdm_kdkmp_entry_id: number | null;
   has_completed_onboarding: boolean;
   two_factor_enabled: boolean;
+  manager_sk_document: {
+    name: string;
+    size: number;
+    uploaded_at: string;
+    preview_url: string;
+  } | null;
   role: UserRole | null;
 };

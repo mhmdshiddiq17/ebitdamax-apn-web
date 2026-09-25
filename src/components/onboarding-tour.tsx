@@ -2,7 +2,7 @@
 
 import { ArrowLeft, ArrowRight, Check, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { apiFetch } from "@/lib/api";
 import type { AuthUser } from "@/types/auth";
@@ -25,26 +25,48 @@ const TOUR_STEPS: TourStep[] = [
   {
     target: '[data-tour="sidebar-navigation"]',
     title: "Navigasi aplikasi",
-    description: "Gunakan menu untuk membuka Dashboard, Tugas Harian, Meeting, LMS, dan fitur lainnya.",
-    path: "/dashboard",
+    description: "Gunakan menu untuk membuka Dashboard Gerai, Tugas Harian, Meeting Minutes, dan Action Items.",
+    path: "/dashboard/kdkmp",
   },
   {
-    target: '[data-tour="page-content"]',
-    title: "Area kerja",
-    description: "Konten halaman aktif tampil di sini. Ringkasan akun dan informasi penting ditampilkan ringkas.",
-    path: "/dashboard",
+    target: '[data-tour="kdkmp-metrics"]',
+    title: "Ringkasan gerai",
+    description: "Pantau revenue, biaya, penyelesaian task, dan ketepatan waktu untuk hari berjalan.",
+    path: "/dashboard/kdkmp",
   },
   {
-    target: '[data-tour="user-menu"]',
-    title: "Menu akun",
-    description: "Atur profil, keamanan akun (2FA), atau keluar dari aplikasi dari menu ini.",
-    path: "/dashboard",
+    target: '[data-tour="financial-matrix"]',
+    title: "Financial Matrix",
+    description: "Bandingkan biaya dan revenue rencana dengan realisasi setiap proses task.",
+    path: "/dashboard/kdkmp",
+  },
+  {
+    target: '[data-tour="daily-input"]',
+    title: "Input harian",
+    description: "Simpan target, kehadiran operasional, dan pilihan task opsional sebelum bekerja.",
+    path: "/dashboard/kdkmp/input",
+  },
+  {
+    target: '[data-tour="task-list"]',
+    title: "Tugas Harian",
+    description: "Mulai dan selesaikan task aktif beserta bukti, field laporan, dan alokasi anggota.",
+    path: "/dashboard/tasks",
+  },
+  {
+    target: '[data-tour="meeting-minutes"]',
+    title: "Meeting Minutes",
+    description: "Catat rapat, lampiran, PIC, tenggat, serta tindak lanjut untuk gerai Anda.",
+    path: "/meeting-minutes",
   },
 ];
 
 const POPOVER_WIDTH = 320;
 const POPOVER_HEIGHT = 220;
-const STEP_STORAGE_KEY = "ebitda-manager-onboarding-step";
+const TOUR_VERSION = 2;
+const STEP_STORAGE_KEY = `ebitda-manager-onboarding-step-v${TOUR_VERSION}`;
+const UPDATE_STORAGE_KEY = "ebitda-manager-onboarding-version";
+
+type TourMode = "onboarding" | "update";
 
 function getTargetRect(target: HTMLElement): TargetRect {
   const rect = target.getBoundingClientRect();
@@ -64,16 +86,24 @@ function getPopoverPosition(rect: TargetRect): { top: number; left: number } {
 export function OnboardingTour({ user }: { user: AuthUser }) {
   const router = useRouter();
   const pathname = usePathname();
+  const popoverRef = useRef<HTMLElement>(null);
 
   const isKdkmpManager = user.role?.domain === "kdkmp" && user.role?.slug === "manager";
-  const shouldShow = isKdkmpManager && !user.has_completed_onboarding;
 
   const [isOpen, setIsOpen] = useState(false);
+  const [showUpdateTour, setShowUpdateTour] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [targetRect, setTargetRect] = useState<TargetRect | null>(null);
 
-  // Diturunkan saat render: tour otomatis tertutup ketika status onboarding selesai.
-  const isActive = isOpen && shouldShow;
+  const tourMode: TourMode | null = !isKdkmpManager
+    ? null
+    : !user.has_completed_onboarding
+      ? "onboarding"
+      : showUpdateTour
+        ? "update"
+        : null;
+
+  const isActive = isOpen && tourMode !== null;
 
   const currentStep = TOUR_STEPS[stepIndex];
   const isLastStep = stepIndex === TOUR_STEPS.length - 1;
@@ -81,18 +111,28 @@ export function OnboardingTour({ user }: { user: AuthUser }) {
 
   const complete = useCallback(() => {
     sessionStorage.removeItem(STEP_STORAGE_KEY);
+    localStorage.setItem(UPDATE_STORAGE_KEY, String(TOUR_VERSION));
     setIsOpen(false);
 
-    // Tour tetap ditutup walau API gagal; status dicoba lagi saat halaman dimuat ulang.
-    apiFetch("/users/complete-onboarding", { method: "POST" })
-      .catch(() => undefined)
-      .finally(() => router.refresh());
-  }, [router]);
+    if (tourMode === "onboarding") {
+      // Tour tetap ditutup walau API gagal; status dicoba lagi saat halaman dimuat ulang.
+      apiFetch("/users/complete-onboarding", { method: "POST" })
+        .catch(() => undefined)
+        .finally(() => router.refresh());
+    }
+  }, [router, tourMode]);
 
   useEffect(() => {
-    if (!shouldShow) {
-      return;
-    }
+    if (!isKdkmpManager || !user.has_completed_onboarding) return;
+
+    const timer = window.setTimeout(() => {
+      setShowUpdateTour(Number(localStorage.getItem(UPDATE_STORAGE_KEY) ?? "0") < TOUR_VERSION);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [isKdkmpManager, user.has_completed_onboarding]);
+
+  useEffect(() => {
+    if (!tourMode) return;
 
     const savedStep = Number.parseInt(sessionStorage.getItem(STEP_STORAGE_KEY) ?? "0", 10);
     const initialStep = savedStep >= 0 && savedStep < TOUR_STEPS.length ? savedStep : 0;
@@ -103,7 +143,13 @@ export function OnboardingTour({ user }: { user: AuthUser }) {
     }, 300);
 
     return () => window.clearTimeout(timer);
-  }, [shouldShow]);
+  }, [tourMode]);
+
+  useEffect(() => {
+    if (isActive && currentStep && currentStep.path !== pathname) {
+      router.replace(currentStep.path);
+    }
+  }, [currentStep, isActive, pathname, router]);
 
   useEffect(() => {
     if (!isActive || !currentStep) {
@@ -159,6 +205,13 @@ export function OnboardingTour({ user }: { user: AuthUser }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [complete, isActive]);
 
+  useEffect(() => {
+    if (!isActive || !targetRect || !popoverPosition) return;
+
+    const frame = window.requestAnimationFrame(() => popoverRef.current?.focus());
+    return () => window.cancelAnimationFrame(frame);
+  }, [isActive, popoverPosition, stepIndex, targetRect]);
+
   const moveToStep = (nextIndex: number) => {
     const nextStep = TOUR_STEPS[nextIndex];
     if (!nextStep) {
@@ -192,8 +245,13 @@ export function OnboardingTour({ user }: { user: AuthUser }) {
       />
 
       <section
+        ref={popoverRef}
+        role="dialog"
+        aria-labelledby="onboarding-tour-title"
+        aria-describedby="onboarding-tour-description"
         aria-label="Panduan penggunaan aplikasi"
         aria-live="polite"
+        tabIndex={-1}
         className="fixed z-[62] w-[min(320px,calc(100vw-32px))] rounded-xl border border-border bg-card p-5 text-card-foreground shadow-lg"
         style={popoverPosition}
       >
@@ -202,14 +260,14 @@ export function OnboardingTour({ user }: { user: AuthUser }) {
             <p className="text-xs font-medium tracking-wide text-primary uppercase">
               Langkah {stepIndex + 1} dari {TOUR_STEPS.length}
             </p>
-            <h2 className="mt-1 text-base font-semibold">{currentStep.title}</h2>
+            <h2 id="onboarding-tour-title" className="mt-1 text-base font-semibold">{currentStep.title}</h2>
           </div>
           <Button type="button" variant="ghost" size="icon-sm" aria-label="Lewati panduan" onClick={complete}>
             <X />
           </Button>
         </div>
 
-        <p className="mt-3 text-sm leading-6 text-muted-foreground">{currentStep.description}</p>
+        <p id="onboarding-tour-description" className="mt-3 text-sm leading-6 text-muted-foreground">{currentStep.description}</p>
 
         <div className="mt-5 flex items-center justify-end gap-2">
           <Button

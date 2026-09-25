@@ -65,16 +65,12 @@ export function TwoFactorChallengeForm() {
           <Button type="submit" className="w-full" disabled={submitting}>
             {submitting ? "Memverifikasi…" : "Verifikasi"}
           </Button>
-          <p className="text-center text-xs text-muted-foreground">
-            Salah menekan tombol?{" "}
-            <button
-              type="button"
-              className="underline underline-offset-4 hover:text-foreground"
-              onClick={() => router.replace("/login")}
-            >
+          <div className="space-y-2 text-center text-xs text-muted-foreground">
+            <p>Salah menekan tombol?</p>
+            <Button type="button" variant="outline" size="sm" onClick={() => router.replace("/login")}>
               Kembali ke halaman masuk
-            </button>
-          </p>
+            </Button>
+          </div>
         </form>
       </CardContent>
     </Card>

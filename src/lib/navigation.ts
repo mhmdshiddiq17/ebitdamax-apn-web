@@ -1,14 +1,13 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Bell,
-  BookOpen,
   CalendarDays,
   ClipboardList,
   Database,
   LayoutDashboard,
+  ListChecks,
   Map,
   Megaphone,
-  MessagesSquare,
   ScrollText,
   Settings,
   ShieldCheck,
@@ -42,10 +41,15 @@ export function navigationForRole(role: AuthUser["role"]): NavGroup[] {
       label: "Operasional",
       items: [
         { title: "Dashboard", href: isManager ? "/dashboard/kdkmp" : "/dashboard", icon: LayoutDashboard, status: "ready" },
-        ...(isManager || isRegionalManager
+        ...(isManager
           ? ([
               { title: "Tugas Harian", href: "/dashboard/tasks", icon: ClipboardList, status: "ready" },
-              { title: "Meeting Minutes", href: "/meeting-minutes", icon: CalendarDays, status: "soon" },
+            ] satisfies NavItem[])
+          : []),
+        ...(isManager
+          ? ([
+              { title: "Meeting Minutes", href: "/meeting-minutes", icon: CalendarDays, status: "ready" },
+              { title: "Action Items", href: "/meeting-minutes/action-items", icon: ListChecks, status: "ready" },
             ] satisfies NavItem[])
           : []),
       ],
@@ -78,7 +82,6 @@ export function navigationForRole(role: AuthUser["role"]): NavGroup[] {
         label: "Komunikasi",
         items: [
           { title: "Pengumuman", href: "/announcements", icon: Megaphone, status: "soon" },
-          { title: "Action Items", href: "/meeting-minutes/action-items", icon: CalendarDays, status: "soon" },
         ],
       },
     );
@@ -87,12 +90,6 @@ export function navigationForRole(role: AuthUser["role"]): NavGroup[] {
   groups.push({
     label: "Umum",
     items: [
-      ...(isManager || isRegionalManager
-        ? ([
-            { title: "LMS KDKMP", href: "/lms-kdkmp", icon: BookOpen, status: "soon" },
-            { title: "Lumbung Chat", href: "/lumbung-kms/chat", icon: MessagesSquare, status: "soon" },
-          ] satisfies NavItem[])
-        : []),
       { title: "Notifikasi", href: "/notifications", icon: Bell, status: "soon" },
       { title: "Pengaturan", href: "/settings/profile", icon: Settings, status: "ready" },
     ],

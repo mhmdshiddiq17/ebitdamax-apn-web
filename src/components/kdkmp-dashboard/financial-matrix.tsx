@@ -12,6 +12,7 @@ import {
   YAxis,
 } from "recharts";
 import type { TooltipContentProps } from "recharts";
+import { BarChart3, CheckSquare2, Clock3, Coins, Gauge, TrendingDown, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatRupiah } from "@/lib/formatters";
@@ -86,14 +87,14 @@ export function FinancialMatrix({ matrix }: { matrix: KdkmpFinancialMatrix }) {
     <Card>
       <CardHeader className="gap-3">
         <div>
-          <CardTitle>Financial Matrix</CardTitle>
+          <CardTitle className="flex items-center gap-2"><BarChart3 className="size-5 text-primary" aria-hidden="true" />Financial Matrix</CardTitle>
           <CardDescription>Perbandingan biaya dan revenue rencana serta realisasi berdasarkan task hari ini.</CardDescription>
         </div>
         <div className="grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-4">
-          <Metric label="Fixed cost" value={money(matrix.fixed_cost)} />
-          <Metric label="Variable cost" value={money(matrix.total_variable_cost)} />
-          <Metric label="Plan EBITDA" value={money(matrix.plan_ebitda)} />
-          <Metric label="Actual EBITDA" value={money(matrix.actual_ebitda)} />
+          <Metric icon={Coins} label="Fixed cost" value={money(matrix.fixed_cost)} />
+          <Metric icon={TrendingDown} label="Variable cost" value={money(matrix.total_variable_cost)} />
+          <Metric icon={TrendingUp} label="Plan EBITDA" value={money(matrix.plan_ebitda)} />
+          <Metric icon={Gauge} label="Actual EBITDA" value={money(matrix.actual_ebitda)} />
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -128,13 +129,13 @@ export function FinancialMatrix({ matrix }: { matrix: KdkmpFinancialMatrix }) {
           <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">Belum ada task terpilih untuk ditampilkan pada matrix.</p>
         )}
 
-        <Table>
+        <Table className="min-w-[640px]">
           <TableHeader>
             <TableRow>
-              <TableHead>Task</TableHead>
-              <TableHead className="text-right">Estimasi</TableHead>
-              <TableHead className="text-right">Plan cost</TableHead>
-              <TableHead className="text-right">Actual cost</TableHead>
+              <TableHead><span className="flex items-center gap-2"><CheckSquare2 className="size-4" aria-hidden="true" />Task</span></TableHead>
+              <TableHead className="text-right"><span className="flex items-center justify-end gap-2"><Clock3 className="size-4" aria-hidden="true" />Estimasi</span></TableHead>
+              <TableHead className="text-right"><span className="flex items-center justify-end gap-2"><TrendingUp className="size-4" aria-hidden="true" />Plan cost</span></TableHead>
+              <TableHead className="text-right"><span className="flex items-center justify-end gap-2"><Coins className="size-4" aria-hidden="true" />Actual cost</span></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -154,6 +155,6 @@ export function FinancialMatrix({ matrix }: { matrix: KdkmpFinancialMatrix }) {
   );
 }
 
-function Metric({ label, value }: { label: string; value: string }) {
-  return <div className="rounded-lg bg-muted px-3 py-2"><p className="text-xs text-muted-foreground">{label}</p><p className="font-medium tabular-nums">{value}</p></div>;
+function Metric({ icon: Icon, label, value }: { icon: typeof Coins; label: string; value: string }) {
+  return <div className="rounded-lg bg-muted px-3 py-2"><p className="flex items-center gap-2 text-xs text-muted-foreground"><Icon className="size-4" aria-hidden="true" />{label}</p><p className="font-medium tabular-nums">{value}</p></div>;
 }

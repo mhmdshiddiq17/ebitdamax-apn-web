@@ -20,7 +20,7 @@ export function SettingsNav() {
         <Link
           key={item.href}
           href={item.href}
-          className={cn(buttonVariants({ variant: pathname === item.href ? "default" : "ghost", size: "sm" }))}
+          className={cn(buttonVariants({ variant: pathname === item.href ? "default" : "outline", size: "sm" }))}
         >
           {item.title}
         </Link>

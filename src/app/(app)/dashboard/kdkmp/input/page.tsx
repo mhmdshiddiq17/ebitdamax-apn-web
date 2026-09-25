@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ArrowLeft, CalendarDays, ClipboardCheck } from "lucide-react";
 import { KdkmpDailyInput } from "@/components/kdkmp-dashboard/daily-input";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,8 +27,8 @@ export default async function KdkmpDashboardInputPage() {
   return (
     <>
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div><h1 className="font-heading text-2xl font-semibold">Input Harian</h1><p className="text-sm text-muted-foreground">{data.kdkmp.name} · {formatDate(data.business_date)}</p></div>
-        <Link href="/dashboard/kdkmp" className={buttonVariants({ variant: "outline" })}>Kembali ke dashboard</Link>
+        <div><h1 className="flex items-center gap-2 font-heading text-2xl font-semibold"><ClipboardCheck className="size-6 text-primary" aria-hidden="true" />Input Harian</h1><p className="flex items-center gap-2 text-sm text-muted-foreground"><CalendarDays className="size-4" aria-hidden="true" />{data.kdkmp.name} · {formatDate(data.business_date)}</p></div>
+        <Link href="/dashboard/kdkmp" className={buttonVariants({ variant: "outline" })}><ArrowLeft className="size-4" aria-hidden="true" />Kembali ke dashboard</Link>
       </div>
       <KdkmpDailyInput data={data} />
     </>

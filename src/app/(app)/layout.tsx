@@ -24,9 +24,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider>
       <AppSidebar user={user} />
-      <SidebarInset>
+      <SidebarInset className="min-w-0 overflow-x-hidden">
         <AppHeader user={user} />
-        <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6" data-tour="page-content">
+        <div className="flex min-w-0 flex-1 flex-col gap-6 overflow-x-hidden p-4 sm:p-6" data-tour="page-content">
           {children}
         </div>
       </SidebarInset>
