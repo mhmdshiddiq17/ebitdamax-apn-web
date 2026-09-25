@@ -12,9 +12,8 @@ import {
   YAxis,
 } from "recharts";
 import type { TooltipContentProps } from "recharts";
-import { BarChart3, CheckSquare2, Clock3, Coins, Gauge, TrendingDown, TrendingUp } from "lucide-react";
+import { BarChart3, Coins, Gauge, TrendingDown, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatRupiah } from "@/lib/formatters";
 import type { KdkmpFinancialMatrix, KdkmpFinancialMatrixPoint } from "@/types/kdkmp-dashboard";
 
@@ -100,7 +99,7 @@ export function FinancialMatrix({ matrix }: { matrix: KdkmpFinancialMatrix }) {
       <CardContent className="space-y-6">
         {chartData.length ? (
           <div className="overflow-x-auto pb-2" aria-label="Grafik financial matrix">
-            <div className="h-[460px] min-w-[960px]">
+            <div className="h-115 min-w-240">
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart data={chartData} margin={{ top: 24, right: 28, left: 12, bottom: 88 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
@@ -129,27 +128,6 @@ export function FinancialMatrix({ matrix }: { matrix: KdkmpFinancialMatrix }) {
           <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">Belum ada task terpilih untuk ditampilkan pada matrix.</p>
         )}
 
-        <Table className="min-w-[640px]">
-          <TableHeader>
-            <TableRow>
-              <TableHead><span className="flex items-center gap-2"><CheckSquare2 className="size-4" aria-hidden="true" />Task</span></TableHead>
-              <TableHead className="text-right"><span className="flex items-center justify-end gap-2"><Clock3 className="size-4" aria-hidden="true" />Estimasi</span></TableHead>
-              <TableHead className="text-right"><span className="flex items-center justify-end gap-2"><TrendingUp className="size-4" aria-hidden="true" />Plan cost</span></TableHead>
-              <TableHead className="text-right"><span className="flex items-center justify-end gap-2"><Coins className="size-4" aria-hidden="true" />Actual cost</span></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {matrix.points.map((point) => (
-              <TableRow key={point.task_id}>
-                <TableCell className="font-medium">{point.task_name}</TableCell>
-                <TableCell className="text-right tabular-nums">{point.estimated_minutes} mnt</TableCell>
-                <TableCell className="text-right tabular-nums">{money(point.plan_cost)}</TableCell>
-                <TableCell className="text-right tabular-nums">{money(point.actual_cost)}</TableCell>
-              </TableRow>
-            ))}
-            {!matrix.points.length ? <TableRow><TableCell colSpan={4} className="py-8 text-center text-muted-foreground">Belum ada data matrix.</TableCell></TableRow> : null}
-          </TableBody>
-        </Table>
       </CardContent>
     </Card>
   );

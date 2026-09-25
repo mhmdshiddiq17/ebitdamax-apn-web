@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { TaskAttendanceCard } from "@/components/task-dashboard/task-attendance-card";
 import { TaskList } from "@/components/task-dashboard/task-list";
 import { TaskSummaryCards } from "@/components/task-dashboard/task-summary-cards";
 import { buttonVariants } from "@/components/ui/button";
@@ -55,10 +54,6 @@ export default async function TaskDashboardPage() {
       </div>
 
       <TaskSummaryCards summary={dashboard.summary} businessDate={dashboard.business_date} />
-
-      {dashboard.operational_attendance ? (
-        <TaskAttendanceCard attendance={dashboard.operational_attendance} inputHref={isKdkmpManager ? "/dashboard/kdkmp/input" : undefined} />
-      ) : null}
 
       <TaskList
         tasks={dashboard.tasks}
