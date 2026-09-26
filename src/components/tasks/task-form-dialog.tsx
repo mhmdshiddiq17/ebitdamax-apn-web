@@ -307,11 +307,11 @@ export function TaskFormDialog({ open, onOpenChange, task, categories, roles, on
             </div>
 
             <div className="flex flex-wrap gap-6">
-              <label className="flex items-center gap-2 text-sm">
+              <label className="flex cursor-pointer items-center gap-2 text-sm">
                 <Checkbox checked={isActive} onCheckedChange={(checked) => setIsActive(checked === true)} />
                 Task aktif
               </label>
-              <label className="flex items-center gap-2 text-sm">
+              <label className="flex cursor-pointer items-center gap-2 text-sm">
                 <Checkbox checked={isMandatory} onCheckedChange={(checked) => setIsMandatory(checked === true)} />
                 Task wajib
               </label>

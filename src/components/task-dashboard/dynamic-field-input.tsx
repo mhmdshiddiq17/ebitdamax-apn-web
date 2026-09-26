@@ -73,7 +73,7 @@ export function DynamicFieldInput({ field, value, onValueChange, file, onFileCha
 
     case "boolean":
       return (
-        <label className="flex items-center gap-2 text-sm">
+        <label className="flex cursor-pointer items-center gap-2 text-sm">
           <Checkbox
             checked={value === "1"}
             onCheckedChange={(checked) => onValueChange(checked === true ? "1" : "0")}
@@ -91,7 +91,7 @@ export function DynamicFieldInput({ field, value, onValueChange, file, onFileCha
           </Label>
           <select
             id={inputId}
-            className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+            className="h-8 w-full cursor-pointer rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
             value={stringValue}
             onChange={(event) => onValueChange(event.target.value)}
           >
@@ -113,7 +113,7 @@ export function DynamicFieldInput({ field, value, onValueChange, file, onFileCha
           </p>
           <div className="flex flex-wrap gap-3">
             {field.options.map((option) => (
-              <label key={option} className="flex items-center gap-2 text-sm">
+              <label key={option} className="flex cursor-pointer items-center gap-2 text-sm">
                 <input
                   type="radio"
                   name={inputId}
@@ -142,7 +142,7 @@ export function DynamicFieldInput({ field, value, onValueChange, file, onFileCha
               const checked = selected.includes(option);
 
               return (
-                <label key={option} className="flex items-center gap-2 text-sm">
+                <label key={option} className="flex cursor-pointer items-center gap-2 text-sm">
                   <Checkbox
                     checked={checked}
                     onCheckedChange={(state) =>

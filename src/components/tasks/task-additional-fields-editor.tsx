@@ -115,7 +115,7 @@ export function TaskAdditionalFieldsEditor({ value, onChange }: Props) {
                     </Select>
                   </div>
 
-                  <label className="flex items-center gap-2 self-end pb-1.5 text-sm">
+                  <label className="flex cursor-pointer items-center gap-2 self-end pb-1.5 text-sm">
                     <Checkbox
                       checked={field.is_required}
                       onCheckedChange={(checked) => updateField(index, { is_required: checked === true })}

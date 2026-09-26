@@ -23,7 +23,7 @@ export function UserMenu({ user }: { user: AuthUser }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="rounded-full outline-none transition hover:ring-2 hover:ring-ring/40 focus-visible:ring-2 focus-visible:ring-ring"
         aria-label="Menu akun"
         data-tour="user-menu"
       >

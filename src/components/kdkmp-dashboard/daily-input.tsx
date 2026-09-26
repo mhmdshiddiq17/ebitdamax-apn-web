@@ -82,7 +82,7 @@ export function KdkmpDailyInput({ data }: { data: KdkmpDashboardInputResponse })
             {OPERATIONAL_ATTENDANCE_ROLES.map((role) => (
               <div key={role.key} className="space-y-2">
                 <Label htmlFor={`attendance-${role.key}`} className="flex items-center gap-2"><UsersRound className="size-4" aria-hidden="true" />{role.label}</Label>
-                <Input id={`attendance-${role.key}`} type="number" min="0" step="1" required value={attendance[role.key]} onChange={(event) => setAttendance((current) => ({ ...current, [role.key]: event.target.value }))} />
+                <Input id={`attendance-${role.key}`} type="text" inputMode="numeric" pattern="[0-9]+" title="Masukkan jumlah dalam bilangan bulat non-negatif." required value={attendance[role.key]} onChange={(event) => setAttendance((current) => ({ ...current, [role.key]: event.target.value }))} />
               </div>
             ))}
             <div className="sm:col-span-2"><Button type="submit" disabled={submitting !== null}><Save className="size-4" aria-hidden="true" />{submitting === "attendance" ? "Menyimpan…" : "Simpan kehadiran"}</Button></div>
@@ -105,7 +105,7 @@ export function KdkmpDailyInput({ data }: { data: KdkmpDashboardInputResponse })
               const label = group.tasks[0]?.bmc_status_label ?? "Kategori lainnya";
               return (
                 <div key={group.label} className="rounded-lg border p-4">
-                  <label className="flex items-center gap-3 font-medium">
+                  <label className="flex cursor-pointer items-center gap-3 font-medium">
                     {optionalTasks.length ? <Checkbox checked={checked} disabled={locked} onCheckedChange={(value) => toggleGroup(taskIDs, value === true)} /> : null}
                     <span className="flex items-center gap-2"><CheckSquare2 className="size-4" aria-hidden="true" />{label}</span>
                     {locked ? <Badge>Berjalan</Badge> : null}

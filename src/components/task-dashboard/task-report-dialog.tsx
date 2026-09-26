@@ -249,7 +249,7 @@ export function TaskReportDialog({
                   ))}
                 </div>
 
-                <label className="flex items-center gap-2 text-sm">
+                <label className="flex cursor-pointer items-center gap-2 text-sm">
                   <Checkbox
                     checked={selfAssigned}
                     onCheckedChange={(checked) => setSelfAssigned(checked === true)}

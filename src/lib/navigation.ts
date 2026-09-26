@@ -63,7 +63,7 @@ export function navigationForRole(role: AuthUser["role"]): NavGroup[] {
     groups.push({
       label: "Monitoring",
       items: [
-        { title: "Monitoring KDKMP", href: "/admin/kdkmp-dashboard", icon: ScrollText, status: "soon" },
+        { title: "Monitoring KDKMP", href: "/admin/kdkmp-dashboard", icon: ScrollText, status: "ready" },
         { title: "Peta Nasional", href: "/monitoring", icon: Map, status: "soon" },
         { title: "Data SDM", href: "/sdm-data", icon: Database, status: "soon" },
       ],

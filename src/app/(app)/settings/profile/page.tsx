@@ -1,4 +1,3 @@
-import { PasswordForm } from "@/components/settings/password-form";
 import { ProfileForm } from "@/components/settings/profile-form";
 import { SettingsNav } from "@/components/settings/settings-nav";
 import { serverApiFetch } from "@/lib/server-api";
@@ -14,13 +13,12 @@ export default async function ProfileSettingsPage() {
       <div className="space-y-3">
         <div>
           <h1 className="font-heading text-2xl font-semibold">Pengaturan</h1>
-          <p className="text-sm text-muted-foreground">Kelola profil dan kata sandi akun Anda.</p>
+          <p className="text-sm text-muted-foreground">Kelola profil akun Anda.</p>
         </div>
         <SettingsNav />
       </div>
 
       <ProfileForm user={user} />
-      <PasswordForm />
     </>
   );
 }

@@ -99,7 +99,7 @@ function ManagerSKCard({ document }: { document: AuthUser["manager_sk_document"]
               <p className="truncate font-medium">{document.name}</p>
               <p className="text-muted-foreground">{formatFileSize(document.size)} · Diunggah {new Date(document.uploaded_at).toLocaleDateString("id-ID", { dateStyle: "medium" })}</p>
             </div>
-            <Button render={<a href={`${API_BASE}${document.preview_url}`} target="_blank" rel="noreferrer" />} variant="outline" size="sm">
+            <Button nativeButton={false} render={<a href={`${API_BASE}${document.preview_url}`} target="_blank" rel="noreferrer" />} variant="outline" size="sm">
               Lihat SK
             </Button>
           </div>
